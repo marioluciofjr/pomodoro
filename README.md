@@ -9,7 +9,7 @@ Repositório para um projeto que cria um painel com o método Pomodoro na latera
 
 1. Crie uma planilha com o atalho [sheets.new](sheets.new);
 2. Vá no menu Extensões e clique em Apps Script;
-3. Clique no ícone de + e depois em HTML, a fim de inserir o codigo [pomodoro](https://github.com/marioluciofjr/pomodoro/blob/main/pomodoro.html);
+3. Clique no ícone de + e depois em HTML, a fim de inserir o código [pomodoro](https://github.com/marioluciofjr/pomodoro/blob/main/pomodoro.html);
 4. Salve o código HTML;
 5. Agora clique no ícone de + e depois em Script, a fim de inserir o código [painel_pomodoro](https://github.com/marioluciofjr/pomodoro/blob/main/painel_pomodoro.gs);
 6. Salve o código AppsScript;
