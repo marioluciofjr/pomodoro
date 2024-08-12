@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Método Pomodoro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            margin: 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .display {
+            font-size: 36px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid #28a745;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 10px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #28a745;
+            animation: rotate 1s linear infinite;
+            z-index: -1;
+        }
+        @keyframes rotate {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #218838;
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .button-container button:active {
+            background-color: #218838;
+        }
+        .button-container .reset-button {
+            background-color: #dc3545;
+        }
+        .button-container .reset-button:active {
+            background-color: #c82333;
+        }
+        .input-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .input-container label {
+            margin: 5px;
+        }
+        .alert {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffc107;
+            color: #212529;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            font-size: 18px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="display">
+        <div id="display">00:00</div>
+        <div class="circle" id="circle"></div>
+    </div>
+    <div class="input-container">
+        <label for="pomodoro-time">Tempo Pomodoro (min):</label>
+        <input id="pomodoro-time" type="number" min="1" value="25">
+        <label for="break-time">Tempo de Pausa (min):</label>
+        <input id="break-time" type="number" min="1" value="5">
+    </div>
+    <div class="button-container">
+        <button onclick="startPomodoro()">Iniciar Pomodoro</button>
+        <button class="reset-button" onclick="resetPomodoro()">Resetar</button>
+    </div>
+    <div class="alert" id="alert"></div>
+
+    <script>
+        let pomodoroInterval;
+        let breakInterval;
+        let isPomodoro = true;
+        let timeLeft = 0;
+        const alertDiv = document.getElementById('alert');
+        const circle = document.getElementById('circle');
+        const beepSound = new Audio('https://www.soundjay.com/button/beep-07.wav');
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function updateDisplay() {
+            document.getElementById('display').innerText = formatTime(timeLeft);
+        }
+
+        function showAlert(message) {
+            beepSound.play();
+            alertDiv.innerText = message;
+            alertDiv.style.display = 'block';
+            setTimeout(() => alertDiv.style.display = 'none', 3000);
+        }
+
+        function startPomodoro() {
+            const pomodoroTime = parseInt(document.getElementById('pomodoro-time').value, 10) * 60;
+            const breakTime = parseInt(document.getElementById('break-time').value, 10) * 60;
+
+            timeLeft = pomodoroTime;
+            isPomodoro = true;
+
+            if (pomodoroInterval) clearInterval(pomodoroInterval);
+            if (breakInterval) clearInterval(breakInterval);
+
+            updateDisplay();
+            circle.style.animationDuration = `${pomodoroTime}s`;
+
+            pomodoroInterval = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(pomodoroInterval);
+                    showAlert('Tempo de Pomodoro terminado! Comece a pausa.');
+                    startBreak(breakTime);
+                }
+            }, 1000);
+        }
+
+        function startBreak(breakTime) {
+            isPomodoro = false;
+            timeLeft = breakTime;
+            circle.style.animationDuration = `${breakTime}s`;
+
+            breakInterval = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(breakInterval);
+                    showAlert('Pausa terminada! Comece um novo Pomodoro.');
+                }
+            }, 1000);
+        }
+
+        function resetPomodoro() {
+            clearInterval(pomodoroInterval);
+            clearInterval(breakInterval);
+            timeLeft = 0;
+            updateDisplay();
+            circle.style.animationDuration = '0s';
+            showAlert('Pomodoro resetado.');
+        }
+    </script>
+</body>
+</html>
